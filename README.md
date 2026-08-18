@@ -21,13 +21,13 @@ corresponding summary table. All runs use **CPLEX 20.1.0** in single-threaded mo
 
 Counts (`#N`, `#C`) are integers.  For every other numeric cell, `0` means the quantity
 is exactly zero (it did not occur at all), `<0.1` means it is positive but too small to
-show at one decimal, `NA` means the quantity is not defined for that run, and everything
-else is the value itself.  **No cell is ever parenthesised or negative**, so the files can
-be opened directly in a spreadsheet.
+show at one decimal, `TL` means the run stopped at the time limit, `NA` means the quantity
+is not defined for that run, and everything else is the value itself.  **No cell is ever
+parenthesised or negative**, so the files can be opened directly in a spreadsheet.
 
 | Symbol   | Meaning |
 |----------|---------|
-| `T`      | Solve time in CPU seconds, also on a run that reached the time limit. |
+| `T`      | Solve time in CPU seconds on a run that proved optimality; `TL` on a run that stopped at the time limit -- its CPU clock (3591.6 s and the like) would read as if the instance had been solved in that time. |
 | `EG`     | End gap `(DB - PB)/DB` in % of a run that reached the time limit; `NA` on a run that proved optimality. `EG == NA` is therefore an exact "solved" flag. |
 | `#N`     | Number of branch-and-bound nodes plus one, the quantity the summary tables average. `#N = 1` means the search never left the root; whether the root was *solved* or merely *timed out* there is told by `EG`. |
 | `GI`     | Root-node gap improvement (%): the share of the initial LP gap closed at the root by the added cuts, `GI = (z_LP - z_ROOT)/(z_LP - z_IP) * 100`, where `z_LP` is the LP relaxation before any cut, `z_ROOT` the root bound after the cuts, and `z_IP` the best incumbent of the compared configurations.  See the two notes below. |
@@ -58,7 +58,7 @@ Every summary table is the shifted geometric mean over the rows of these files,
 `prod(v_i + 1)^(1/L) - 1`, with shift `1` applied to the value as printed -- including the
 percentage columns, so 5% enters as 5+1.  Two conventions have to be respected:
 
-* a run that did not solve contributes the **time limit** (3600 s), not its measured `T`;
+* `T = TL` enters the average as the time limit, 3600 s;
 * the few `GI` cells that are `NA` -- instances that no configuration solved, so that no
   bound to measure against is known -- are left out of the average; none of them falls
   inside a table bucket, so no published number depends on this.
